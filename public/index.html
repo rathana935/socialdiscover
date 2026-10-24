@@ -1,0 +1,526 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <title>SocialDiscover</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --panel: #151c31;
+      --border: #293451;
+      --text: #f4f6ff;
+      --muted: #a6b1cc;
+      --accent: #7867ff;
+      --accent2: #a69aff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, Arial, sans-serif;
+    }
+
+    header {
+      padding: 24px 18px 18px;
+      background: linear-gradient(135deg, #151c31, #241c50);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span { color: var(--accent2); }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    main {
+      max-width: 700px;
+      margin: auto;
+      padding: 16px;
+      padding-bottom: 100px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      color: white;
+      background: var(--panel);
+    }
+
+    button:focus-visible, input:focus-visible,
+    textarea:focus-visible, select:focus-visible {
+      outline: 2px solid var(--accent2);
+      outline-offset: 2px;
+    }
+
+    .tab {
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .tab.active, .primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 750;
+      margin: 12px 0;
+    }
+
+    .muted { color: var(--muted); }
+
+    .card {
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--panel);
+    }
+
+    .platform {
+      color: var(--accent2);
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .card h3 {
+      margin: 8px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .description {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .open-link {
+      display: inline-block;
+      margin-top: 14px;
+      color: #c1b9ff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 7px;
+      color: var(--muted);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: #0f1628;
+      color: var(--text);
+    }
+
+    textarea { resize: vertical; min-height: 90px; }
+
+    .primary { width: 100%; font-weight: 750; }
+
+    .notice {
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      background: #202947;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hidden { display: none !important; }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
+      background: #10172a;
+      border-top: 1px solid var(--border);
+    }
+
+    .nav-button {
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav-button.active { color: var(--accent2); }
+
+    #status {
+      font-size: 13px;
+      margin: 12px 0;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">Social<span>Discover</span></div>
+    <div class="subtitle">Discover creators. Share your work organically.</div>
+  </header>
+
+  <main>
+    <div id="status" role="status" aria-live="polite"></div>
+
+    <section id="discoverSection">
+      <div class="section-title">Discover content</div>
+
+      <div class="tabs" id="platformTabs">
+        <button class="tab active" data-platform="all">All</button>
+        <button class="tab" data-platform="blog">Blogs</button>
+        <button class="tab" data-platform="youtube">YouTube</button>
+        <button class="tab" data-platform="facebook">Facebook</button>
+        <button class="tab" data-platform="tiktok">TikTok</button>
+      </div>
+
+      <div id="contentList">
+        <div class="card muted">Connect the backend to load approved content.</div>
+      </div>
+    </section>
+
+    <section id="submitSection" class="hidden">
+      <div class="section-title">Publish your content</div>
+      <div class="notice">
+        Your submission will be reviewed by an administrator before appearing in discovery.
+      </div>
+
+      <form id="submitForm">
+        <div class="form-group">
+          <label for="platform">Platform</label>
+          <select id="platform" required>
+            <option value="blog">Blog</option>
+            <option value="youtube">YouTube</option>
+            <option value="facebook">Facebook</option>
+            <option value="tiktok">TikTok</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="title">Content title</label>
+          <input id="title" maxlength="120" minlength="3"
+                 required placeholder="Enter a title">
+        </div>
+
+        <div class="form-group">
+          <label for="url">Content URL (HTTPS)</label>
+          <input id="url" type="url" maxlength="2048"
+                 required placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description (optional)</label>
+          <textarea id="description" maxlength="1000"
+                    placeholder="Describe your content"></textarea>
+        </div>
+
+        <button class="primary" type="submit">Submit for review</button>
+      </form>
+    </section>
+
+    <section id="profileSection" class="hidden">
+      <div class="section-title">My profile</div>
+      <div class="card">
+        <div id="profileName">Telegram user</div>
+        <p class="muted" id="profileMessage">
+          Your account information will be loaded after secure Telegram authentication is connected.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-button active" data-section="discover">Discover</button>
+    <button class="nav-button" data-section="submit">Publish</button>
+    <button class="nav-button" data-section="profile">Profile</button>
+  </nav>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    const statusBox = document.getElementById('status');
+
+    if (tg) {
+      tg.ready();
+      tg.expand();
+
+      const user = tg.initDataUnsafe?.user;
+      if (user) {
+        document.getElementById('profileName').textContent =
+          user.first_name || 'Telegram user';
+      }
+    }
+
+    function showStatus(message) {
+      statusBox.textContent = message;
+    }
+    
+async function authenticateTelegramUser() {
+  if (!tg || !tg.initData) {
+    showStatus('Open SocialDiscover inside Telegram to sign in.');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/me', {
+      method: 'GET',
+      headers: {
+        Authorization: `tma ${tg.initData}`
+      }
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      showStatus(result.message || 'Authentication failed.');
+      return;
+    }
+
+    const name = result.user.first_name || 'Telegram user';
+    document.getElementById('profileName').textContent = name;
+    showStatus(`Signed in as ${name}.`);
+  } catch (error) {
+    console.error('Authentication request failed:', error);
+    showStatus('Cannot connect to the server. Please try again.');
+  }
+}
+
+
+    function navigate(section) {
+      for (const name of ['discover', 'submit', 'profile']) {
+        document.getElementById(name + 'Section')
+          .classList.toggle('hidden', name !== section);
+      }
+
+      document.querySelectorAll('.nav-button').forEach(button => {
+        button.classList.toggle(
+          'active',
+          button.dataset.section === section
+        );
+      });
+
+      if (section === 'discover') {
+        loadContent(currentPlatform === 'all' ? '' : currentPlatform);
+      }
+    }
+
+    document.querySelectorAll('.nav-button').forEach(button => {
+      button.addEventListener('click', () => navigate(button.dataset.section));
+    });
+
+    let currentPlatform = 'all';
+
+    document.querySelectorAll('.tab').forEach(button => {
+      button.addEventListener('click', () => {
+        currentPlatform = button.dataset.platform;
+
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.classList.toggle('active', tab === button);
+        });
+
+        loadContent(currentPlatform === 'all' ? '' : currentPlatform);
+      });
+    });
+
+    function safeHttpsUrl(value) {
+      try {
+        const url = new URL(value);
+        return url.protocol === 'https:' &&
+          !url.username && !url.password;
+      } catch {
+        return false;
+      }
+    }
+
+    function renderContent(items) {
+      const list = document.getElementById('contentList');
+      list.replaceChildren();
+
+      if (!items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'card muted';
+        empty.textContent = 'No approved content found yet.';
+        list.appendChild(empty);
+        return;
+      }
+
+      for (const item of items) {
+        if (!safeHttpsUrl(item.content_url)) continue;
+
+        const card = document.createElement('article');
+        card.className = 'card';
+
+        const platform = document.createElement('div');
+        platform.className = 'platform';
+        platform.textContent = item.platform;
+
+        const title = document.createElement('h3');
+        title.textContent = item.title;
+
+        const description = document.createElement('p');
+        description.className = 'description';
+        description.textContent = item.description || 'No description provided.';
+
+        const link = document.createElement('a');
+        link.className = 'open-link';
+        link.href = item.content_url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = 'Open content ↗';
+
+        card.append(platform, title, description, link);
+        list.appendChild(card);
+      }
+    }
+
+    
+async function loadContent(platform = '') {
+  if (!tg?.initData) {
+    showStatus('Open SocialDiscover inside Telegram to load content.');
+    return;
+  }
+
+  try {
+    const query = platform
+      ? `?platform=${encodeURIComponent(platform)}`
+      : '';
+
+    const response = await fetch(`/api/content${query}`, {
+      headers: {
+        Authorization: `tma ${tg.initData}`
+      }
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      showStatus(result.message || 'Unable to load content.');
+      return;
+    }
+
+    renderContent(result.items);
+
+    showStatus(
+      result.items.length
+        ? `Loaded ${result.items.length} approved posts.`
+        : 'No approved posts yet.'
+    );
+  } catch (error) {
+    console.error('Content loading failed:', error);
+    showStatus('Could not connect to SocialDiscover. Try again.');
+  }
+}
+
+    document.getElementById('submitForm').addEventListener('submit', async event => {
+      event.preventDefault();
+
+      if (!tg || !tg.initData) {
+        showStatus('Open SocialDiscover inside Telegram to publish content.');
+        return;
+      }
+
+      const form = event.currentTarget;
+      const submitButton = form.querySelector('button[type="submit"]');
+      const payload = {
+        platform: document.getElementById('platform').value,
+        title: document.getElementById('title').value.trim(),
+        content_url: document.getElementById('url').value.trim(),
+        description: document.getElementById('description').value.trim()
+      };
+
+      if (!safeHttpsUrl(payload.content_url)) {
+        showStatus('Please enter a valid HTTPS URL.');
+        return;
+      }
+
+      try {
+        if (submitButton) submitButton.disabled = true;
+        showStatus('Submitting your post for review...');
+
+        const response = await fetch('/api/content', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'tma ' + tg.initData
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          showStatus(result.message || 'Submission failed.');
+          return;
+        }
+
+        form.reset();
+        showStatus('Your post was submitted and is awaiting moderation.');
+      } catch (error) {
+        console.error('Content submission failed:', error);
+        showStatus('Could not connect to the server. Please try again.');
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
+    });
+
+    // Authenticate first; after successful authentication, load approved content.
+    // In a normal browser, Telegram initData will be unavailable.
+    const originalAuthenticateTelegramUser = authenticateTelegramUser;
+    async function startSocialDiscover() {
+      await originalAuthenticateTelegramUser();
+      if (tg && tg.initData) {
+        await loadContent(currentPlatform === 'all' ? '' : currentPlatform);
+      }
+    }
+    startSocialDiscover();
+  </script>
+</body>
+</html>
+You are unauthorized on Surfe.be
+Authorize
